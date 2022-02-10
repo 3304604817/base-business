@@ -1,0 +1,138 @@
+server:
+  port: 8087
+  servlet:
+    # 项目虚拟路径
+    context-path: /
+spring:
+  application:
+    name: base-business
+  shardingsphere:
+    datasource:
+      # 数据源名称，多数据源以逗号分隔
+      names: master, slave
+      master:
+        # 数据库连接池类名称
+        type: com.alibaba.druid.pool.DruidDataSource
+        # 数据库驱动类名
+#        driver-class-name: com.mysql.jdbc.Driver # MySQL8.0之前
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${SPRING_DATASOURCE_URL:jdbc:mysql://39.101.202.67:3306/db_business?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false}
+        username: ${SPRING_DATASOURCE_USERNAME:root}
+        password: ${SPRING_DATASOURCE_PASSWORD:738e7101490b}
+      slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+#        driver-class-name: com.mysql.jdbc.Driver # MySQL8.0之前
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${SPRING_DATASOURCE_URL:jdbc:mysql://39.101.202.67:3306/db_business?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false}
+        username: ${SPRING_DATASOURCE_USERNAME:root}
+        password: ${SPRING_DATASOURCE_PASSWORD:738e7101490b}
+    masterslave:
+      # 用于配置从库负载均衡算法类型，可选值：ROUND_ROBIN(轮询)，RANDOM（随机）
+      load-balance-algorithm-type: round_robin
+      # 最终的数据源名称
+      name: dataSource
+      # 主库数据源名称
+      master-data-source-name: master
+      # 从库数据源名称列表，多个逗号分隔
+      slave-data-source-names: slave
+    props:
+      # 开启SQL显示，默认false
+      sql:
+        show: true
+  security:
+    user:
+      name: admin
+      password: Admin@123
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 39.101.202.67:8848
+    sentinel:
+      transport:
+        dashboard: 39.101.202.67:8858
+    alibaba:
+      seata:
+        # 事务分组
+        tx-service-group: base_tx_group
+  redis:
+    database: 0
+    host: 39.101.202.67
+    port: 6379
+    password: ^#@^$(@&&@awdsccdawpq028372
+    timeout: 20000        # 连接超时时间（毫秒）
+    jedis:
+      pool:
+        max-active: 8       # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: 20000     # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 8         # 连接池中的最大空闲连接
+        min-idle: 0         # 连接池中的最小空闲连接
+  # 配置文件上传大小限制
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  resources:
+    static-locations: classpath:/static/
+  mvc:
+    static-path-pattern: /static/**
+mybatis:
+  # 指定写xml文件位置
+  mapper-locations:
+    classpath:mapper/**/*.xml
+# 启用SQL日志打印
+logging:
+  level:
+    # dao层文件路径
+    com.supers.basic.infra.mapper: debug
+    com.supers.srm.infra.mapper: debug
+    com.supers.basic.feign: debug
+rocketmq:
+  name-server: 39.101.202.67:9876
+  producer:
+    group: basic-group
+  consumer:
+    group: basic-group
+ribbon:
+  eager-load:
+    # 开启饿加载
+    enabled: true
+    # 饿加载服务
+    clients: basic
+feign:
+  sentinel:
+    # 开启 Openfeign 对 sentinel 的支持
+    enabled: true
+  client:
+    config:
+      # default 是全局，如果要单独配置每个服务，改为服务名
+      default:
+        # 日志级别
+        loggerLevel: FULL
+        # 网络连接时间 10s
+        connectTimeout: 10000
+        # 连接成功后服务处理时间 6s
+        readTimeout: 60000
+minio:
+  url: http://39.101.202.67:9100
+  access-key: gaoyang
+  secret-key: gaoyang@123
+  bucket-name: private
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 39.101.202.67:8848
+      username: nacos
+      password: nacos
+  config:
+    nacos:
+      server-addr: 39.101.202.67:8848
+      username: nacos
+      password: nacos
+  service:
+    # 开启全局事务
+    disable-global-transaction: false
+  client:
+    undo:
+      # 低版本 jackson 序列化不兼容seata，所以换成 kryo
+      undo-log-serialization: kryo
