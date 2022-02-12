@@ -132,7 +132,3 @@ seata:
   service:
     # 开启全局事务
     disable-global-transaction: false
-  client:
-    undo:
-      # 低版本 jackson 序列化不兼容seata，所以换成 kryo
-      undo-log-serialization: kryo
